@@ -1,66 +1,52 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import "./App.css";
 
 /**
- Hook useEffect:
- 1. Cập nhật State
- 2. Cập nhật DOM (mutated)
- 3. re-Render UI
- 4. Gọi cleanup func nếu deps thay đổi
- 5. Gọi useEffect callback
+ 1. Lưu các giá trị qua 1 tham chiếu bên ngoài
+ 2. Function Component
  */
 
-/**
-  Hook useLayoutEffect
-  1. Cập nhật State
-  2. Cập nhật DOM (mutated)
-  3. Gọi cleanup nếu deps thay đổi (sync)
-  4. Gọi useLayoutEffect callback (sync)
-  5. Render lại UI
-  */
-
-const taps = ["posts", "comments", "albums"];
-const lessions = [
-  {
-    id: 1,
-    name: "aaaa",
-  },
-  {
-    id: 2,
-    name: "bbb",
-  },
-  ,
-  {
-    id: 3,
-    name: "ccc",
-  },
-];
 function Content() {
-  const [count, setCount] = useState(0);
-  const handleClick = () => {
-    setCount(count + 1);
-  };
-  // UI sẽ render xong rồi mới chạy callback, lên 4 xong nháy 1 cái về 0
-  // useEffect(() => {
-  //   if (count > 3) {
-  //     setCount(0);
-  //   }
-  // }, [count]);
+  const [count, setCount] = useState(60);
 
-  // Callback sẽ chạy trước khi render
-  useLayoutEffect(() => {
-    if (count > 3) {
-      setCount(0);
-    }
+  const timerId = useRef();
+  const prevCount = useRef();
+  // Lưu DOM element
+  const h1Ref = useRef();
+
+  // useEffect sẽ chạy sau khi component dc mouted, nên nó sẽ render xong
+  // rồi mới xử lý gán giá trị cho ref current. đến khi render lần nữa thì render lại trễ 1 nhịp
+  useEffect(() => {
+    prevCount.current = count;
   }, [count]);
+
+  useEffect(() => {
+    // console.log(h1Ref.current);
+    // Lưu tọa độ
+    const rect = h1Ref.current.getBoundingClientRect();
+    console.log(rect);
+  }, []);
+
+  const handleStart = () => {
+    // Start
+    timerId.current = setInterval(() => {
+      setCount((pre) => pre - 1);
+    }, 1000);
+    console.log("start -", timerId.current);
+  };
+
+  const handleStop = () => {
+    // Stop
+    clearInterval(timerId.current);
+    console.log("stop -", timerId.current);
+  };
 
   return (
     <div>
       <h1>Hello ae</h1>
-      <h1>{count}</h1>
-      <button type="" onClick={handleClick}>
-        Add
-      </button>
+      <h1 ref={h1Ref}>{count}</h1>
+      <button onClick={handleStart}>Start</button>
+      <button onClick={handleStop}>Stop</button>
     </div>
   );
 }
