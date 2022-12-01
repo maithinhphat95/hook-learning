@@ -6,14 +6,7 @@ import "./App.css";
 //
 /**
  Side Effects
-1. Update DOM
-2. Call API
-3. Listen DOM event, subcribe:
-- scroll,
-- resize,
-4. Cleanup: remove listener/ unsubcribe, clear timer
-5. Create avatar
-6. Fake Chat: subcribe
+
  */
 
 /**
